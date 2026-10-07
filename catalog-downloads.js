@@ -18,7 +18,7 @@ function statesFor(item,lookup=()=>null,seen=new Set()){
   }
  }else if(item.full_map){states.push({label:'Full map',frames:[{file:item.full_map}]});}
  else if(item.frames?.length){
-  if(['variants','map_pages','font_atlas'].includes(item.kind))item.frames.filter(f=>f.file).forEach((f,i)=>states.push({label:f.label||'Variant '+(i+1),frames:[f]}));
+  if(['variants','map_pages','font_atlas'].includes(item.kind)&&item.id!=='object_026_two_part_robot')item.frames.filter(f=>f.file).forEach((f,i)=>states.push({label:f.label||'Variant '+(i+1),frames:[f]}));
   else states.push({label:item.id,frames:item.frames.filter(f=>f.file)});
  }
  if(!states.length&&item.file)states.push({label:item.title||item.id,frames:[{file:item.file}]});
