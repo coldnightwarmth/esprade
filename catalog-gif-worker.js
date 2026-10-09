@@ -1,5 +1,5 @@
 import {GIFEncoder,quantize,applyPalette} from './vendor/gifenc.esm.js';
-import './catalog-downloads.js';
+import './catalog-downloads.js?v=20261009-states';
 self.onmessage=async({data:{frames}})=>{
  const images=new Map();
  try{
@@ -23,7 +23,7 @@ self.onmessage=async({data:{frames}})=>{
     for(let j=0;j<index.length;j++)index[j]=rgba[j*4+3]<128?0:index[j]+1;
     pal={palette:[[0,0,0],...palette],index,transparent:true};
    }
-   elapsed+=Math.max(1,Number(f.duration_ticks)||8)*17.376;
+   elapsed+=f.duration_ms||Math.max(1,Number(f.duration_ticks)||8)*17.376;
    // GIF stores centiseconds; sub-20ms frames are slowed by browser decoders.
    const delay=Math.max(20,Math.round((elapsed-encoded)/10)*10);encoded+=delay;
    gif.writeFrame(pal.index,p.width,p.height,{palette:pal.palette,transparent:pal.transparent,transparentIndex:0,delay,repeat:0,dispose:2});

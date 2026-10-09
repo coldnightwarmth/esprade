@@ -8,8 +8,7 @@ function statesFor(item,lookup=()=>null,seen=new Set()){
  if(item.animations?.length){
   for(const a of item.animations){
    const fs=(a.frames||[]).filter(f=>f.file);if(!fs.length)continue;
-   if(a.kind==='variants')fs.forEach((f,i)=>states.push({label:`${a.id} · ${f.label||'variant '+(i+1)}`,frames:[f]}));
-   else states.push({label:a.id||item.id,frames:fs});
+   states.push({label:a.id||item.id,kind:a.kind,frames:fs});
   }
  }else if(item.kind==='object'&&item.references?.length){
   for(const ref of item.references){
@@ -18,8 +17,8 @@ function statesFor(item,lookup=()=>null,seen=new Set()){
   }
  }else if(item.full_map){states.push({label:'Full map',frames:[{file:item.full_map}]});}
  else if(item.frames?.length){
-  if(['variants','map_pages','font_atlas'].includes(item.kind)&&item.id!=='object_026_two_part_robot')item.frames.filter(f=>f.file).forEach((f,i)=>states.push({label:f.label||'Variant '+(i+1),frames:[f]}));
-  else states.push({label:item.id,frames:item.frames.filter(f=>f.file)});
+  if(['map_pages','font_atlas'].includes(item.kind))item.frames.filter(f=>f.file).forEach((f,i)=>states.push({label:f.label||'Variant '+(i+1),frames:[f]}));
+  else states.push({label:item.id,kind:item.id==='object_026_two_part_robot'?undefined:item.kind,frames:item.frames.filter(f=>f.file)});
  }
  if(!states.length&&item.file)states.push({label:item.title||item.id,frames:[{file:item.file}]});
  return states.map((s,i)=>({...s,name:safeName(s.label)+'_'+String(i+1).padStart(3,'0')}));
@@ -60,6 +59,7 @@ function exactPalette(rgba){
  if(palette.length<2)palette.push([0,0,0]);
  return {palette,index,transparent};
 }
+function frameDuration(state,frame){return state.kind==='variants'?1000/6:Math.max(1,Number(frame.duration_ticks)||8)*17.376;}
 async function fetchImage(path,signal){
  let last;
  for(let attempt=0;attempt<3;attempt++){
@@ -71,14 +71,14 @@ async function fetchImage(path,signal){
 async function stateFiles(state,signal,progress){
  if(state.frames.length===1)return [{name:state.name+'.png',blob:await fetchImage(state.frames[0].file,signal)}];
  const blob=await new Promise((resolve,reject)=>{
-  const worker=new Worker(new URL('catalog-gif-worker.js',document.baseURI),{type:'module'});
+  const worker=new Worker(new URL('catalog-gif-worker.js?v=20261009-states',document.baseURI),{type:'module'});
   const cleanup=()=>{worker.terminate();signal.removeEventListener('abort',cancel);};
   const cancel=()=>{cleanup();reject(new DOMException('Cancelled','AbortError'));};
   signal.addEventListener('abort',cancel,{once:true});
   if(signal.aborted){cancel();return;}
   worker.onmessage=e=>{if(e.data.progress){progress(...e.data.progress);return;}cleanup();if(e.data.error)reject(new Error(e.data.error));else resolve(new Blob([e.data.bytes],{type:'image/gif'}));};
   worker.onerror=e=>{cleanup();reject(new Error(e.message||'GIF encoder failed'));};
-  worker.postMessage({frames:state.frames.map(f=>({file:new URL(f.file,document.baseURI).href,origin_upright_px:f.origin_upright_px,duration_ticks:f.duration_ticks}))});
+  worker.postMessage({frames:state.frames.map(f=>({file:new URL(f.file,document.baseURI).href,origin_upright_px:f.origin_upright_px,duration_ms:frameDuration(state,f)}))});
  });
  return [{name:state.name+'.gif',blob}];
 }
@@ -137,6 +137,6 @@ function show(item,lookup){
  if(states.length===1)submit.click();
 }
 function button(item,options={}){const b=document.createElement('button');b.className='download-button';b.type='button';b.title='Download';b.setAttribute('aria-label','Download '+(item.title||item.id));b.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>';b.onclick=()=>show(item,options.lookup);return b;}
-const api={statesFor,crc32,zip,frameBounds,exactPalette,enableDrag,button};
+const api={statesFor,crc32,zip,frameBounds,exactPalette,frameDuration,enableDrag,button};
 if(typeof module==='object'&&module.exports)module.exports=api;else root.CatalogDownloads=api;
 })(typeof globalThis==='object'?globalThis:this);
