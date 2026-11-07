@@ -59,7 +59,8 @@ function exactPalette(rgba){
  if(palette.length<2)palette.push([0,0,0]);
  return {palette,index,transparent};
 }
-function frameDuration(state,frame){return state.kind==='variants'?1000/6:Math.max(1,Number(frame.duration_ticks)||8)*17.376;}
+// Static text layouts use the same 6 fps export cadence as grouped variants.
+function frameDuration(state,frame){return state.kind==='variants'||state.kind==='text_layout'?1000/6:Math.max(1,Number(frame.duration_ticks)||8)*17.376;}
 async function fetchImage(path,signal){
  let last;
  for(let attempt=0;attempt<3;attempt++){
