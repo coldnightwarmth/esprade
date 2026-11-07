@@ -34,7 +34,7 @@ function build(data,grouped){
   if(category.has('players')||category.has('playerEffects')||category.has('shots')||/(?:^|_)player_|yusuke|irori|j-b|player select|player-select/.test(name))kind.add('player');
   if(category.has('particles')||category.has('effects')||category.has('playerEffects')||category.has('shots')||['particles','playerEffects'].includes(item.gallery_category)||/particle|projectile|explosion|flame|trail|wake|debris|fragment|special.beam|multipart_death/.test(name))kind.add('fx');
   if(category.has('backgrounds')||/tile_|tile |background|backdrop|storefront|bridge|floor|pavement|environment/.test(name))kind.add('enviro');
-  if(/^(text_|font_)/.test(item.id)||/title|menu|hud|ranking|name.entry|continue|game.over|credits|logo|poster|portrait|player.select|how.to.play|tutorial|demonstration|ending|screen.transition|health.gauge/.test(name))kind.add('menus');
+  if(item.gallery_category==='menus'||/^(text_|font_)/.test(item.id)||/title|menu|hud|ranking|name.entry|continue|game.over|credits|logo|poster|portrait|player.select|how.to.play|tutorial|demonstration|ending|screen.transition|health.gauge/.test(name))kind.add('menus');
   if(category.has('enemies')||/enemy|boss|tank|turret|robot|carrier|aircraft|vehicle/.test(name))kind.add('enemies');
   for(const id of ids){
    if(sceneTypes.has(id)){kind.add('menus');kind.add('player');}

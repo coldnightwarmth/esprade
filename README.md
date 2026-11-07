@@ -16,3 +16,5 @@ available in the inspector. Game artwork belongs to its respective rights holder
 This repository contains the current static publication. Exact duplicate image
 files share a content-addressed path. ROM archives and local research manifests
 are not part of the site. GIF encoding uses gifenc 1.0.3 (MIT; license in `vendor/`).
+
+The gallery loads a compressed catalog index. Additional lossless PNGs are served from the content-addressed image files on the `catalog-images` branch of this repository.
