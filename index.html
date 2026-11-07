@@ -60,7 +60,7 @@ html{scrollbar-gutter:stable}
 <script>
 async function startCatalog() {
 document.querySelector('#summary').textContent='Loading catalog…';
-const response=await fetch('catalog-data-6355be3c337a821f.bin');
+const response=await fetch('catalog-data-31841782ad061f3f.bin');
 if(!response.ok) throw new Error('Catalog request failed ('+response.status+')');
 const payload=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
 const groupedData=(function unpackCatalog(payload){
